@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+:root {
+  --gant-bg: #070b10;
+  --gant-fore: #e2e8f0;
+  --gant-grid: rgba(34, 211, 238, 0.04);
+  --gant-line: rgba(34, 211, 238, 0.12);
+}
+
+@theme inline {
+  --color-background: var(--gant-bg);
+  --color-foreground: var(--gant-fore);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--gant-bg);
+  background-image:
+    linear-gradient(var(--gant-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--gant-grid) 1px, transparent 1px);
+  background-size: 32px 32px, 32px 32px;
+  color: var(--gant-fore);
+  font-family: var(--font-sans, system-ui), system-ui, sans-serif;
+}
+
+.gant-canvas {
+  min-height: 100%;
+}
+
+.gant-panel {
+  border: 1px solid var(--gant-line);
+  border-radius: 4px;
+  background: rgba(15, 23, 42, 0.65);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.06) inset, 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+.gant-card {
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  border-radius: 4px;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.9) 0%, rgba(7, 11, 16, 0.95) 100%);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+}
+
+.gant-input {
+  color: #e2e8f0;
+  outline: none;
+}
+
+.gant-input:focus {
+  border-color: rgba(34, 211, 238, 0.45) !important;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2);
+}
+
+.gant-btn {
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.25) 0%, rgba(6, 182, 212, 0.12) 100%);
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  color: #a5f3fc;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.gant-btn:hover {
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.35) 0%, rgba(6, 182, 212, 0.18) 100%);
+  border-color: rgba(34, 211, 238, 0.55);
+}
+
+.gant-btn:active {
+  transform: translateY(0.5px);
+}
+
+.gant-grid {
+  border: 1px solid var(--gant-line);
+  border-radius: 4px;
+  background: rgba(7, 11, 16, 0.5);
+}
+
+input[type="date"] {
+  color-scheme: dark;
+}

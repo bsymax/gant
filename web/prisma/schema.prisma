@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite 无原生 enum，用 String + 应用层约束
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      String // LEAD | MEMBER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectMembers ProjectMember[]
+  taskAssignees  TaskAssignee[]
+  auditLogs      AuditLog[]
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  title        String
+  description  String   @default("")
+  status       String   @default("ACTIVE") // DRAFT | ACTIVE | DONE | ARCHIVED
+  scheduleMode String   @default("IN_RESERVE") // IN_RESERVE | ON_TIMELINE | TBD_ON_TIMELINE
+  plannedStart DateTime?
+  plannedEnd   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  members ProjectMember[]
+  tasks   Task[]
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, userId])
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String   @default("")
+  status      String   @default("TODO") // TODO | IN_PROGRESS | DONE | CANCELLED
+  plannedStart DateTime?
+  plannedEnd  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assignees TaskAssignee[]
+}
+
+model TaskAssignee {
+  id        String   @id @default(cuid())
+  taskId    String
+  userId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([taskId, userId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  entityType String // PROJECT | TASK
+  entityId   String
+  action     String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  diffJson   String
+  createdAt  DateTime @default(now())
+}
