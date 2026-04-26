@@ -8,7 +8,7 @@ export default async function LoginPage() {
   if (s) {
     redirect("/command");
   }
-  const users = await prisma.user.findMany({ orderBy: { email: "asc" } });
+  const users = await prisma.user.findMany({ orderBy: { erp: "asc" } });
   return (
     <div className="gant-canvas flex min-h-full flex-1 items-center justify-center p-6">
       <div className="gant-panel w-full max-w-md p-6">
@@ -32,7 +32,7 @@ export default async function LoginPage() {
             </option>
             {users.map((u) => (
               <option key={u.id} value={u.id}>
-                {u.name} {u.email} ({u.role === "LEAD" ? "组长" : "成员"})
+                {u.name} {u.erp}（{u.role === "LEAD" ? "组长" : "成员"}）
               </option>
             ))}
           </select>

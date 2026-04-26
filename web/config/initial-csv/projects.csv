@@ -1,4 +1,5 @@
 title,description,scheduleMode,status,plannedStart,plannedEnd
-示例·储备中的探索,默认在战情池,IN_RESERVE,ACTIVE,,
-示例·已上时间轴,演示甘特条,ON_TIMELINE,ACTIVE,2026-04-20,2026-05-10
-示例·待定 TBD,在轴上日期待定,TBD_ON_TIMELINE,ACTIVE,,
+储备·新材料预研,探索阶段未上正式排期,IN_RESERVE,ACTIVE,,
+在研·B端控制台一期,本季度产线主交付,ON_TIMELINE,ACTIVE,2026-04-15,2026-06-30
+待钉·Q3策略课题,已上轴、起止日期待团队拍板,TBD_ON_TIMELINE,ACTIVE,,
+协同·兄弟部门接口,与外部组联调窗口未锁,TBD_ON_TIMELINE,ACTIVE,,

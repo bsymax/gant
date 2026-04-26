@@ -1,7 +1,7 @@
 # 开发安排与版本控制（执行稿）
 
 > 与 `PRD-项目管理系统-分版本规划.md` v0.3 对齐。  
-> **2026-04-26**：`web/` 已可本地跑通（当前 **0.2.0**：极光 v2 配色、文档与 `config/initial-data.json` 可配初值），见 `README.md`、`CHANGELOG.md`、**`docs/README.md`**。
+> **2026-04-26**：`web/` 可本地跑通；用户键为 **ERP**（`0.4.0`），及极光配色、CSV 初值等，见 `CHANGELOG.md`、`docs/README.md`。
 
 ---
 

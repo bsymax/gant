@@ -10,7 +10,7 @@ datasource db {
 // SQLite 无原生 enum，用 String + 应用层约束
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
+  erp       String   @unique
   name      String
   role      String // LEAD | MEMBER
   createdAt DateTime @default(now())

@@ -101,20 +101,20 @@ function main() {
 
   const users: InitialDataFile["users"] = [];
   for (const r of userRows) {
-    const email = (r["email"] ?? r["e-mail"] ?? r["用户邮箱"] ?? "").trim();
+    const erp = (r["erp"] ?? r["工号"] ?? r["员工号"] ?? "").trim();
     const name = (r["name"] ?? r["显示名"] ?? r["姓名"] ?? "").trim();
     const role = (r["role"] ?? r["角色"] ?? "").trim().toUpperCase();
-    if (!email || !name || !role) {
-      console.warn("跳过不完整的用户行（需 email, name, role）:", r);
+    if (!erp || !name || !role) {
+      console.warn("跳过不完整的用户行（需 erp, name, role）:", r);
       continue;
     }
     if (role !== "LEAD" && role !== "MEMBER")
-      throw new Error(`用户 role 仅能为 LEAD 或 MEMBER: ${email} → ${role}`);
-    users.push({ email, name, role: role as "LEAD" | "MEMBER" });
+      throw new Error(`用户 role 仅能为 LEAD 或 MEMBER: ${erp} → ${role}`);
+    users.push({ erp, name, role: role as "LEAD" | "MEMBER" });
   }
   if (!users.length) throw new Error("users.csv 无有效用户");
 
-  const userEmails = new Set(users.map((u) => u.email));
+  const userErps = new Set(users.map((u) => u.erp));
   const projRows = readTable("projects.csv");
   const memRows = readTable("project_members.csv");
   const taskRows = readTable("tasks.csv");
@@ -123,9 +123,10 @@ function main() {
   for (const m of memRows) {
     const pt =
       (m["projecttitle"] ?? m["project_title"] ?? m["项目标题"] ?? "").trim();
-    const ue = (m["useremail"] ?? m["user_email"] ?? m["用户邮箱"] ?? "").trim();
+    const ue = (m["usererp"] ?? m["user_erp"] ?? m["工号"] ?? "").trim();
     if (!pt || !ue) continue;
-    if (!userEmails.has(ue)) throw new Error(`project_members 中邮箱未在 users 中定义: ${ue}`);
+    if (!userErps.has(ue))
+      throw new Error(`project_members 中 ERP 未在 users 中定义: ${ue}`);
     const arr = memBy.get(pt) ?? [];
     arr.push(ue);
     memBy.set(pt, arr);
@@ -138,15 +139,15 @@ function main() {
     const title = (t["title"] ?? t["事项"] ?? t["任务标题"] ?? "").trim();
     if (!pt || !title) continue;
     const st = (t["status"] ?? t["状态"] ?? "TODO").trim() || "TODO";
-    const ae = (t["assigneeemails"] ?? t["assignee_emails"] ?? t["协作人邮箱"] ?? "").trim();
-    const assigneeEmails = ae
+    const ae = (t["assigneeerps"] ?? t["assignee_erps"] ?? t["协作人工号"] ?? "").trim();
+    const assigneeErps = ae
       ? ae.split(/[,;，、]/).map((s) => s.trim()).filter(Boolean)
       : undefined;
-    for (const e of assigneeEmails ?? [])
-      if (!userEmails.has(e))
-        throw new Error(`任务协作人 ${e} 未在 users 中定义`);
+    for (const e of assigneeErps ?? [])
+      if (!userErps.has(e))
+        throw new Error(`任务协作人 ERP ${e} 未在 users 中定义`);
     const one: InitialDataTask = { title, status: st };
-    if (assigneeEmails?.length) one.assigneeEmails = assigneeEmails;
+    if (assigneeErps?.length) one.assigneeErps = assigneeErps;
     const list = tasksBy.get(pt) ?? [];
     list.push(one);
     tasksBy.set(pt, list);
@@ -179,16 +180,16 @@ function main() {
     const plannedStart = (p["plannedstart"] ?? p["planned_start"] ?? p["计划开始"] ?? "").trim();
     const plannedEnd = (p["plannedend"] ?? p["planned_end"] ?? p["计划结束"] ?? "").trim();
 
-    const memberEmails = memBy.get(title) ?? [];
-    if (memberEmails.length === 0) {
+    const memberErps = memBy.get(title) ?? [];
+    if (memberErps.length === 0) {
       throw new Error(
         `项目「${title}」在 project_members.csv 中没有任何成员。请为每个项目至少配置一行或删除该项目行。`
       );
     }
-    for (const e of memberEmails)
-      if (!userEmails.has(e))
+    for (const e of memberErps)
+      if (!userErps.has(e))
         throw new Error(
-          `项目「${title}」成员 ${e} 未在 users.csv 中`
+          `项目「${title}」成员 ERP ${e} 未在 users.csv 中`
         );
 
     const proj: InitialDataProject = {
@@ -196,7 +197,7 @@ function main() {
       description,
       scheduleMode,
       status,
-      memberEmails: [...new Set(memberEmails)],
+      memberErps: [...new Set(memberErps)],
     };
     if (plannedStart) proj.plannedStart = plannedStart;
     if (plannedEnd) proj.plannedEnd = plannedEnd;

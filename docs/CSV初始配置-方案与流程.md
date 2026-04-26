@@ -14,16 +14,16 @@
 
 | 文件 | 必填 | 作用 |
 |------|------|------|
-| `users.csv` | 是 | 所有登录身份（1 个 LEAD + 若干 MEMBER 常见） |
+| `users.csv` | 是 | 所有登录身份（**erp** 工号、姓名、角色，1 个 LEAD + 若干 MEMBER 常见） |
 | `projects.csv` | 是 | 可只有表头、无项目行（表示不建项目） |
-| `project_members.csv` | 否* | 为每个项目点兵：项目标题 + 用户邮箱，每行一个人 |
-| `tasks.csv` | 否 | 项目下事项；无则只留表头或留空文件 |
+| `project_members.csv` | 否* | 为每个项目点兵：项目标题 + **userErp(工号)**，每行一个人 |
+| `tasks.csv` | 否 | 项目下事项；`assigneeErps` 为**英文逗号**分隔的 **ERP**；无则只留表头或留空文件 |
 
 *若 `projects` 里已有项目，则**每个项目**在 `project_members` 里**至少**要有一行，否则会报错，避免误配出「无成员项目」。
 
 ## 3. 数据怎么关联（重要）
 
-- **人**：全局唯一用 **`email`**。  
+- **人**：全局唯一用 **ERP 工号 `erp`（CSV 中 users 列为 `erp`，成员表里为 `userErp`）**。  
 - **项目**：在 `projects` 和 `project_members` / `tasks` 里用**完全相同的**「项目标题」`title` 字符串（含标点、全角半角要一致）。  
 - **起止日期**：`YYYY-MM-DD`；`IN_RESERVE` 一般留空；`TBD_ON_TIMELINE` 两列都空；`ON_TIMELINE` 建议填 `plannedStart`（`plannedEnd` 可空，见《初始化配置说明》）。  
 
@@ -55,8 +55,13 @@ npm run db:seed
 ## 6. 脚本与维护位置
 
 - 转换脚本：`web/scripts/csv-to-initial-data.ts`  
-- 要改**列名兼容**、**多语言表头**时，只改此脚本中 `r[" email "]` 一类的映射即可。  
+- 要改**列名兼容**、**多语言表头**时，只改此脚本中 `r["erp"]` / `usererp` 等映射即可。  
 
-## 7. 版本
+## 7. 与数据库关系
 
-本机制自 **0.3.0** 起随 CHANGELOG 记录；与 PRD/业务无冲突，只增加一种导入途径。
+- 自 **0.4.0** 起，`User` 表**唯一外显键**为 `erp`（**不再**使用 `email`）。自旧版升级时，迁移会**将原 `email` 值拷入 `erp`**，可再用 CSV/JSON 重灌为正式工号。
+
+## 8. 版本
+
+- **0.3.0**：首版 CSV 导入。  
+- **0.4.0**：用户与所有关联**统一为 ERP**。

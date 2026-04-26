@@ -24,7 +24,8 @@ export default async function CommandLayout({
         <div className="flex items-center gap-4 text-sm text-[var(--gant-fore-secondary)]">
           <span>
             {s.name}
-            <span className="ml-2 text-sky-400/90">
+            <span className="ml-2 font-mono text-sky-400/90">{s.erp}</span>
+            <span className="ml-1 text-[var(--gant-fore-secondary)]">
               {s.role === "LEAD" ? "组长" : "成员"}
             </span>
           </span>

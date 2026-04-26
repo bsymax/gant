@@ -34,7 +34,7 @@ export default async function ProjectDetailPage({
   });
   if (!project) notFound();
 
-  const allUsers = await prisma.user.findMany({ orderBy: { email: "asc" } });
+  const allUsers = await prisma.user.findMany({ orderBy: { erp: "asc" } });
   const memberIds = new Set(project.members.map((m) => m.userId));
 
   const logs = await prisma.auditLog.findMany({

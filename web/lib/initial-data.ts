@@ -3,7 +3,7 @@ import path from "node:path";
 
 /** 与 `config/initial-data.json` 结构一致，见 `docs/初始化配置说明.md` */
 export type InitialDataUser = {
-  email: string;
+  erp: string;
   name: string;
   role: "LEAD" | "MEMBER";
 };
@@ -11,7 +11,7 @@ export type InitialDataUser = {
 export type InitialDataTask = {
   title: string;
   status?: string;
-  assigneeEmails?: string[];
+  assigneeErps?: string[];
 };
 
 export type InitialDataProject = {
@@ -22,7 +22,7 @@ export type InitialDataProject = {
   /** ISO 日期，如 2026-04-26 */
   plannedStart?: string;
   plannedEnd?: string;
-  memberEmails: string[];
+  memberErps: string[];
   tasks?: InitialDataTask[];
 };
 

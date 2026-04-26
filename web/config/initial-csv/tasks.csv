@@ -1,2 +1,4 @@
-projectTitle,title,status,assigneeEmails
-示例·已上时间轴,示例事项,IN_PROGRESS,lead@local.dev
+projectTitle,title,status,assigneeErps
+在研·B端控制台一期,接口契约与 Mock 联调,DONE,8800102
+在研·B端控制台一期,甘特区性能与 TBD 联调,IN_PROGRESS,8800102,8800103
+储备·新材料预研,调研纪要整理与下周评审点,TODO,8800101

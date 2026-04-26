@@ -18,15 +18,15 @@ async function seedFromFile(data: InitialDataFile) {
   }
   for (const u of data.users) {
     await prisma.user.upsert({
-      where: { email: u.email },
+      where: { erp: u.erp },
       update: { name: u.name, role: u.role },
-      create: { email: u.email, name: u.name, role: u.role },
+      create: { erp: u.erp, name: u.name, role: u.role },
     });
   }
   const lead = await prisma.user.findFirst({ where: { role: "LEAD" } });
   if (!lead) throw new Error("至少需要一个 role 为 LEAD 的用户");
-  const userByEmail = new Map(
-    (await prisma.user.findMany()).map((x) => [x.email, x])
+  const userByErp = new Map(
+    (await prisma.user.findMany()).map((x) => [x.erp, x])
   );
 
   for (const p of data.projects ?? []) {
@@ -49,10 +49,10 @@ async function seedFromFile(data: InitialDataFile) {
         plannedEnd: plannedEnd ?? undefined,
       },
     });
-    for (const email of p.memberEmails ?? []) {
-      const u = userByEmail.get(email);
+    for (const erp of p.memberErps ?? []) {
+      const u = userByErp.get(erp);
       if (!u) {
-        console.warn("  无此用户，跳过入项:", email);
+        console.warn("  无此用户(ERP)，跳过入项:", erp);
         continue;
       }
       await prisma.projectMember.create({
@@ -67,8 +67,8 @@ async function seedFromFile(data: InitialDataFile) {
           status: t.status ?? "TODO",
         },
       });
-      for (const em of t.assigneeEmails ?? []) {
-        const u = userByEmail.get(em);
+      for (const e of t.assigneeErps ?? []) {
+        const u = userByErp.get(e);
         if (!u) continue;
         const ok = await prisma.taskAssignee.findFirst({
           where: { taskId: task.id, userId: u.id },
@@ -100,10 +100,10 @@ async function seedFromFile(data: InitialDataFile) {
 /** 无配置文件时的默认演示数据 */
 async function seedDefault() {
   const lead = await prisma.user.upsert({
-    where: { email: "lead@local.dev" },
+    where: { erp: "8800001" },
     update: {},
     create: {
-      email: "lead@local.dev",
+      erp: "8800001",
       name: "组长",
       role: "LEAD",
     },
@@ -120,12 +120,13 @@ async function seedDefault() {
   ];
 
   for (let i = 0; i < members.length; i++) {
-    const n = i + 1;
+    const n = 8800101 + i;
+    const erp = String(n);
     await prisma.user.upsert({
-      where: { email: `member${n}@local.dev` },
+      where: { erp },
       update: {},
       create: {
-        email: `member${n}@local.dev`,
+        erp,
         name: members[i]!,
         role: "MEMBER",
       },

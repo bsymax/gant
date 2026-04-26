@@ -16,7 +16,7 @@ function getSecret() {
 export type SessionUser = {
   id: string;
   name: string;
-  email: string;
+  erp: string;
   role: string;
 };
 
@@ -33,7 +33,7 @@ export async function getSession(): Promise<SessionUser | null> {
     return {
       id: u.id,
       name: u.name,
-      email: u.email,
+      erp: u.erp,
       role: u.role,
     };
   } catch {
