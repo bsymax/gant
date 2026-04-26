@@ -1,0 +1,4 @@
+title,description,scheduleMode,status,plannedStart,plannedEnd
+示例·储备中的探索,默认在战情池,IN_RESERVE,ACTIVE,,
+示例·已上时间轴,演示甘特条,ON_TIMELINE,ACTIVE,2026-04-20,2026-05-10
+示例·待定 TBD,在轴上日期待定,TBD_ON_TIMELINE,ACTIVE,,

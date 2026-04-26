@@ -1,5 +1,19 @@
 # 变更记录
 
+## [0.3.0] - 2026-04-26
+
+### 新增
+
+- **CSV 初值表**：`web/config/initial-csv/` 下 `users`、`projects`、`project_members`、`tasks` 四表；`npm run config:from-csv` 生成 `config/initial-data.json`。
+- 转换脚本 `web/scripts/csv-to-initial-data.ts`（自实现轻量 CSV 解析，支持引号与英文逗号分隔协作人列表）。
+- 文档 [docs/CSV初始配置-方案与流程.md](./docs/CSV初始配置-方案与流程.md)，并回链至「初始化配置说明 / 系统功能与文件地图 / docs 索引」。
+
+### 工程
+
+- `web/package.json` 版本 **0.3.0**，新增脚本 `config:from-csv`。
+
+---
+
 ## [0.2.0] - 2026-04-26
 
 ### 新增

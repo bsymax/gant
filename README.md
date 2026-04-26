@@ -4,7 +4,8 @@
 |--------|--------|
 | **想改页面/找文件** | [`docs/系统功能与文件地图.md`](./docs/系统功能与文件地图.md) |
 | **想调颜色、变亮/变清** | [`docs/界面与配色-极光指挥台v2.md`](./docs/界面与配色-极光指挥台v2.md) + `web/app/globals.css` |
-| **想表格里先配人、再导入** | [`docs/初始化配置说明.md`](./docs/初始化配置说明.md) 与表模板；JSON 用 `web/config/initial-data.example.json` 复制为 `initial-data.json` |
+| **用 Excel/CSV 配人、再转库** | [`docs/CSV初始配置-方案与流程.md`](./docs/CSV初始配置-方案与流程.md) · 表在 `web/config/initial-csv/`，`npm run config:from-csv` 再 `db:seed` |
+| **直接写 JSON 导入** | [`docs/初始化配置说明.md`](./docs/初始化配置说明.md) |
 | 产品大方向 | `docs/PRD-项目管理系统-分版本规划.md` |
 | 开发节奏 | `docs/DEV-PLAN.md` |
 | 文档总索引 | [`docs/README.md`](./docs/README.md) |
