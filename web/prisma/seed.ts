@@ -1,8 +1,104 @@
 import { PrismaClient } from "@prisma/client";
+import type { InitialDataFile } from "../lib/initial-data";
+import { loadInitialDataFile } from "../lib/initial-data";
 
 const prisma = new PrismaClient();
 
-async function main() {
+function parseDay(s: string | undefined): Date | null {
+  if (!s?.trim()) return null;
+  const d = new Date(s.trim());
+  if (Number.isNaN(d.getTime())) return null;
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+async function seedFromFile(data: InitialDataFile) {
+  if (!data.users?.length) {
+    throw new Error("initial-data.json 中 users 不能为空");
+  }
+  for (const u of data.users) {
+    await prisma.user.upsert({
+      where: { email: u.email },
+      update: { name: u.name, role: u.role },
+      create: { email: u.email, name: u.name, role: u.role },
+    });
+  }
+  const lead = await prisma.user.findFirst({ where: { role: "LEAD" } });
+  if (!lead) throw new Error("至少需要一个 role 为 LEAD 的用户");
+  const userByEmail = new Map(
+    (await prisma.user.findMany()).map((x) => [x.email, x])
+  );
+
+  for (const p of data.projects ?? []) {
+    const existing = await prisma.project.findFirst({
+      where: { title: p.title },
+    });
+    if (existing) {
+      console.log("Seed 跳过(已存在项目):", p.title);
+      continue;
+    }
+    const plannedStart = parseDay(p.plannedStart);
+    const plannedEnd = parseDay(p.plannedEnd);
+    const project = await prisma.project.create({
+      data: {
+        title: p.title,
+        description: p.description ?? "",
+        scheduleMode: p.scheduleMode,
+        status: p.status ?? "ACTIVE",
+        plannedStart: plannedStart ?? undefined,
+        plannedEnd: plannedEnd ?? undefined,
+      },
+    });
+    for (const email of p.memberEmails ?? []) {
+      const u = userByEmail.get(email);
+      if (!u) {
+        console.warn("  无此用户，跳过入项:", email);
+        continue;
+      }
+      await prisma.projectMember.create({
+        data: { projectId: project.id, userId: u.id },
+      });
+    }
+    for (const t of p.tasks ?? []) {
+      const task = await prisma.task.create({
+        data: {
+          projectId: project.id,
+          title: t.title,
+          status: t.status ?? "TODO",
+        },
+      });
+      for (const em of t.assigneeEmails ?? []) {
+        const u = userByEmail.get(em);
+        if (!u) continue;
+        const ok = await prisma.taskAssignee.findFirst({
+          where: { taskId: task.id, userId: u.id },
+        });
+        if (!ok) {
+          await prisma.taskAssignee.create({
+            data: { taskId: task.id, userId: u.id },
+          });
+        }
+      }
+    }
+  }
+
+  const anyProject = await prisma.project.findFirst();
+  if (anyProject) {
+    await prisma.auditLog.create({
+      data: {
+        entityType: "PROJECT",
+        entityId: anyProject.id,
+        action: "seed_config",
+        userId: lead.id,
+        diffJson: JSON.stringify({ source: "config/initial-data.json" }),
+      },
+    });
+  }
+  console.log("Seed OK: 自 initial-data.json");
+}
+
+/** 无配置文件时的默认演示数据 */
+async function seedDefault() {
   const lead = await prisma.user.upsert({
     where: { email: "lead@local.dev" },
     update: {},
@@ -107,6 +203,15 @@ async function main() {
   });
 
   console.log("Seed OK: lead + 7 members, 3 demo projects");
+}
+
+async function main() {
+  const fromFile = loadInitialDataFile();
+  if (fromFile?.users?.length) {
+    await seedFromFile(fromFile);
+  } else {
+    await seedDefault();
+  }
 }
 
 main()

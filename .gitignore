@@ -11,3 +11,6 @@ web/*.tsbuildinfo
 web/prisma/*.db
 web/prisma/*.db-journal
 web/prisma/prisma/
+
+# 本地初值（由 initial-data.example.json 复制，勿提交自己的名单）
+web/config/initial-data.json

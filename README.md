@@ -1,6 +1,13 @@
 # GANT — 创新团队项目指挥台
 
-产品需求见 `docs/PRD-项目管理系统-分版本规划.md`，开发节奏见 `docs/DEV-PLAN.md`。
+| 你关心… | 看这里 |
+|--------|--------|
+| **想改页面/找文件** | [`docs/系统功能与文件地图.md`](./docs/系统功能与文件地图.md) |
+| **想调颜色、变亮/变清** | [`docs/界面与配色-极光指挥台v2.md`](./docs/界面与配色-极光指挥台v2.md) + `web/app/globals.css` |
+| **想表格里先配人、再导入** | [`docs/初始化配置说明.md`](./docs/初始化配置说明.md) 与表模板；JSON 用 `web/config/initial-data.example.json` 复制为 `initial-data.json` |
+| 产品大方向 | `docs/PRD-项目管理系统-分版本规划.md` |
+| 开发节奏 | `docs/DEV-PLAN.md` |
+| 文档总索引 | [`docs/README.md`](./docs/README.md) |
 
 ## 快速开始（本地）
 

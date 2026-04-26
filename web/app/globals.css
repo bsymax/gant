@@ -1,10 +1,39 @@
 @import "tailwindcss";
 
+/**
+ * 主题名：「极光指挥台 · Aurora v2」
+ * 设计目标：在保留科技感/轻度游戏 HUD 的前提下，提高对比度与可读性。
+ * 调亮主背景与面板、加强网格与描边、正文用更亮的灰阶。
+ * 单文件总控：改配色优先改此处 CSS 变量与 .gant-* 类。
+ */
 :root {
-  --gant-bg: #070b10;
-  --gant-fore: #e2e8f0;
-  --gant-grid: rgba(34, 211, 238, 0.04);
-  --gant-line: rgba(34, 211, 238, 0.12);
+  /* 主底：带蓝的深灰，避免纯黑 */
+  --gant-bg: #1b2635;
+  --gant-bg-2: #24364a;
+  /* 轻雾层（假光照） */
+  --gant-glow: radial-gradient(
+    ellipse 85% 55% at 50% -15%,
+    rgba(56, 189, 248, 0.14),
+    transparent 55%
+  );
+  /* 主文字与次要文字 */
+  --gant-fore: #f0f4f8;
+  --gant-fore-secondary: #b8c5d4;
+  --gant-muted: #7d8fa3;
+  /* 网格与分隔：更明显 */
+  --gant-grid: rgba(56, 189, 248, 0.1);
+  --gant-line: rgba(56, 189, 248, 0.28);
+  --gant-line-soft: rgba(56, 189, 248, 0.14);
+  /* 强调色：青 + 琥珀任务色 */
+  --gant-accent: #38bdf8;
+  --gant-accent-dim: rgba(56, 189, 248, 0.35);
+  --gant-amber: #fbbf24;
+  --gant-violet: #a78bfa;
+  /* 输入/卡片表面 */
+  --gant-surface: rgba(45, 62, 84, 0.92);
+  --gant-surface-2: rgba(36, 54, 74, 0.95);
+  --gant-input-bg: #2a3a50;
+  --gant-border-input: rgba(56, 189, 248, 0.35);
 }
 
 @theme inline {
@@ -21,10 +50,12 @@ body {
 
 body {
   background-color: var(--gant-bg);
-  background-image:
-    linear-gradient(var(--gant-grid) 1px, transparent 1px),
+  background-image: var(--gant-glow), linear-gradient(
+      var(--gant-grid) 1px,
+      transparent 1px
+    ),
     linear-gradient(90deg, var(--gant-grid) 1px, transparent 1px);
-  background-size: 32px 32px, 32px 32px;
+  background-size: auto, 28px 28px, 28px 28px;
   color: var(--gant-fore);
   font-family: var(--font-sans, system-ui), system-ui, sans-serif;
 }
@@ -33,54 +64,159 @@ body {
   min-height: 100%;
 }
 
+/* 大面板 */
 .gant-panel {
   border: 1px solid var(--gant-line);
-  border-radius: 4px;
-  background: rgba(15, 23, 42, 0.65);
-  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.06) inset, 0 8px 32px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  background: linear-gradient(
+    160deg,
+    var(--gant-surface) 0%,
+    var(--gant-surface-2) 100%
+  );
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 10px 40px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
 }
 
+/* 战情卡 */
 .gant-card {
-  border: 1px solid rgba(34, 211, 238, 0.15);
-  border-radius: 4px;
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.9) 0%, rgba(7, 11, 16, 0.95) 100%);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--gant-line-soft);
+  border-radius: 8px;
+  background: linear-gradient(
+    150deg,
+    rgba(50, 68, 92, 0.95) 0%,
+    rgba(32, 46, 64, 0.98) 100%
+  );
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.12) inset,
+    0 6px 24px rgba(0, 0, 0, 0.15);
 }
 
-.gant-input {
-  color: #e2e8f0;
+/* 顶栏、登录条等 */
+.gant-header-bar {
+  border-bottom: 1px solid var(--gant-line-soft);
+  background: linear-gradient(
+    180deg,
+    rgba(36, 54, 74, 0.88) 0%,
+    rgba(27, 40, 55, 0.72) 100%
+  );
+  backdrop-filter: blur(10px);
+}
+
+/* 输入框 */
+.gant-input,
+.gant-field {
+  color: var(--gant-fore);
+  background: var(--gant-input-bg);
+  border: 1px solid var(--gant-border-input);
+  border-radius: 6px;
   outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.gant-input:focus {
-  border-color: rgba(34, 211, 238, 0.45) !important;
-  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2);
+.gant-input::placeholder,
+.gant-field::placeholder {
+  color: var(--gant-muted);
 }
 
+.gant-input:focus,
+.gant-field:focus {
+  border-color: var(--gant-accent) !important;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+}
+
+/* 主按钮 */
 .gant-btn {
-  background: linear-gradient(180deg, rgba(6, 182, 212, 0.25) 0%, rgba(6, 182, 212, 0.12) 100%);
-  border: 1px solid rgba(34, 211, 238, 0.35);
-  color: #a5f3fc;
+  background: linear-gradient(
+    180deg,
+    rgba(14, 165, 233, 0.45) 0%,
+    rgba(2, 132, 199, 0.28) 100%
+  );
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  color: #e0f2fe;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  border-radius: 6px;
+  transition: background 0.15s, border-color 0.15s, transform 0.08s;
 }
 
 .gant-btn:hover {
-  background: linear-gradient(180deg, rgba(6, 182, 212, 0.35) 0%, rgba(6, 182, 212, 0.18) 100%);
-  border-color: rgba(34, 211, 238, 0.55);
+  background: linear-gradient(
+    180deg,
+    rgba(14, 165, 233, 0.55) 0%,
+    rgba(2, 132, 199, 0.38) 100%
+  );
+  border-color: rgba(125, 211, 252, 0.75);
 }
 
 .gant-btn:active {
   transform: translateY(0.5px);
 }
 
+/* 次要按钮/幽灵 */
+.gant-btn-ghost {
+  background: transparent;
+  border: 1px solid var(--gant-line);
+  color: var(--gant-fore-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.gant-btn-ghost:hover {
+  border-color: var(--gant-accent-dim);
+  color: var(--gant-fore);
+  background: rgba(56, 189, 248, 0.08);
+}
+
+/* 时间轴大容器 */
 .gant-grid {
   border: 1px solid var(--gant-line);
+  border-radius: 8px;
+  background: rgba(27, 40, 55, 0.5);
+}
+
+/* 区段小标题 */
+.gant-section-amber {
+  color: #fde68a;
+  text-shadow: 0 0 24px rgba(251, 191, 36, 0.2);
+}
+.gant-section-cyan {
+  color: #7dd3fc;
+  text-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+}
+.gant-text-muted {
+  color: var(--gant-muted);
+}
+.gant-text-body {
+  color: var(--gant-fore-secondary);
+}
+.gant-text-accent {
+  color: #7dd3fc;
+}
+.gant-link {
+  color: #7dd3fc;
+}
+.gant-link:hover {
+  color: #bae6fd;
+  text-decoration: underline;
+}
+/* 甘特条 */
+.gant-gantt-bar {
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  background: linear-gradient(
+    180deg,
+    rgba(34, 211, 238, 0.35) 0%,
+    rgba(6, 182, 212, 0.2) 100%
+  );
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.2);
   border-radius: 4px;
-  background: rgba(7, 11, 16, 0.5);
 }
 
 input[type="date"] {
   color-scheme: dark;
+}
+
+/* 保留 radio 在浅色区可读 */
+input[type="radio"] {
+  accent-color: var(--gant-accent);
 }

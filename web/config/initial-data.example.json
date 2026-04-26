@@ -1,0 +1,33 @@
+{
+  "$comment": "复制本文件为 config/initial-data.json 后按你的团队填写。重跑 seed 时按「标题」去重，已存在同名项目会跳过。用户按 email 做 upsert。",
+  "users": [
+    { "email": "lead@local.dev", "name": "组长", "role": "LEAD" },
+    { "email": "a@local.dev", "name": "张", "role": "MEMBER" },
+    { "email": "b@local.dev", "name": "李", "role": "MEMBER" }
+  ],
+  "projects": [
+    {
+      "title": "示例·储备中",
+      "description": "在战情池，尚未上时间轴",
+      "scheduleMode": "IN_RESERVE",
+      "status": "ACTIVE",
+      "memberEmails": ["lead@local.dev"]
+    },
+    {
+      "title": "示例·有排期",
+      "description": "已上时间轴，甘特上可见",
+      "scheduleMode": "ON_TIMELINE",
+      "status": "ACTIVE",
+      "plannedStart": "2026-04-20",
+      "plannedEnd": "2026-05-10",
+      "memberEmails": ["lead@local.dev", "a@local.dev"],
+      "tasks": [
+        {
+          "title": "子任务一",
+          "status": "IN_PROGRESS",
+          "assigneeEmails": ["a@local.dev"]
+        }
+      ]
+    }
+  ]
+}

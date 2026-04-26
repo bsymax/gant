@@ -14,25 +14,22 @@ export default async function CommandLayout({
   }
   return (
     <div className="gant-canvas flex min-h-full flex-1 flex-col">
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-cyan-500/15 bg-slate-950/60 px-4 backdrop-blur">
+      <header className="gant-header-bar flex h-12 shrink-0 items-center justify-between px-4">
         <Link
           href="/command"
-          className="font-mono text-sm tracking-[0.2em] text-cyan-300/90"
+          className="font-mono text-sm font-medium tracking-[0.2em] text-cyan-200"
         >
           GANT · 战情
         </Link>
-        <div className="flex items-center gap-4 text-sm text-slate-300">
+        <div className="flex items-center gap-4 text-sm text-[var(--gant-fore-secondary)]">
           <span>
             {s.name}
-            <span className="ml-2 text-cyan-500/70">
+            <span className="ml-2 text-sky-400/90">
               {s.role === "LEAD" ? "组长" : "成员"}
             </span>
           </span>
           <form action={logoutAction}>
-            <button
-              type="submit"
-              className="rounded border border-slate-600/60 px-2 py-1 text-xs text-slate-400 hover:border-cyan-500/30 hover:text-cyan-200/80"
-            >
+            <button type="submit" className="gant-btn-ghost px-2 py-1 text-xs">
               退出
             </button>
           </form>

@@ -51,16 +51,16 @@ export function CommandGantt({
 }: Props) {
   return (
     <div className="gant-panel p-0">
-      <div className="grid grid-cols-[minmax(160px,1fr)_minmax(0,6fr)] gap-0 border-b border-cyan-500/15">
-        <div className="p-2 text-xs text-slate-500" />
+      <div className="grid grid-cols-[minmax(160px,1fr)_minmax(0,6fr)] gap-0 border-b border-[var(--gant-line-soft)]">
+        <div className="gant-text-muted p-2 text-xs" />
         <div
-          className="grid border-l border-cyan-500/10"
+          className="grid border-l border-[var(--gant-line-soft)]"
           style={{ gridTemplateColumns: `repeat(${WEEKS}, minmax(0,1fr))` }}
         >
           {Array.from({ length: WEEKS }, (_, i) => (
             <div
               key={i}
-              className="border-l border-cyan-500/10 p-2 text-center text-[10px] text-slate-500 first:border-l-0"
+              className="gant-text-muted border-l border-[var(--gant-line-soft)] p-2 text-center text-[10px] first:border-l-0"
             >
               {i === 0 ? "本周" : `+${i}周`}
             </div>
@@ -73,39 +73,40 @@ export function CommandGantt({
         return (
           <div
             key={p.id}
-            className="grid grid-cols-[minmax(160px,1fr)_minmax(0,6fr)] border-b border-cyan-500/5"
+            className="grid grid-cols-[minmax(160px,1fr)_minmax(0,6fr)] border-b border-[var(--gant-line-soft)]"
           >
             <div className="p-2">
               <Link
                 href={`/command/projects/${p.id}`}
-                className="text-sm text-cyan-100/90 hover:underline"
+                className="gant-link text-sm font-medium"
               >
                 {p.title}
               </Link>
               <form action={returnToReserve.bind(null, p.id)} className="mt-1">
                 <button
                   type="submit"
-                  className="text-[10px] text-slate-500 hover:text-amber-300/80"
+                  className="gant-text-muted text-[10px] hover:text-amber-300"
                 >
                   降回探索
                 </button>
               </form>
             </div>
-            <div className="relative min-h-12 border-l border-cyan-500/10 p-1">
-              <div className="pointer-events-none absolute inset-0 grid opacity-30"
+            <div className="relative min-h-12 border-l border-[var(--gant-line-soft)] p-1">
+              <div
+                className="pointer-events-none absolute inset-0 grid opacity-40"
                 style={{ gridTemplateColumns: `repeat(${WEEKS}, 1fr)` }}
               >
                 {Array.from({ length: WEEKS }, (_, i) => (
                   <div
                     key={i}
-                    className="border-l border-cyan-500/20 first:border-l-0"
+                    className="border-l border-cyan-400/25 first:border-l-0"
                   />
                 ))}
               </div>
               <div className="relative h-8 w-full">
                 {b.visible ? (
                   <div
-                    className="absolute top-1 h-6 rounded border border-cyan-400/40 bg-cyan-500/20 shadow-[0_0_12px_rgba(34,211,238,0.12)]"
+                    className="gant-gantt-bar absolute top-1 h-6"
                     style={{
                       left: `${b.left}%`,
                       width: `${Math.max(b.width, 1.2)}%`,
@@ -117,7 +118,7 @@ export function CommandGantt({
                     }
                   />
                 ) : (
-                  <span className="p-1 text-[10px] text-slate-600">
+                  <span className="gant-text-muted p-1 text-[10px]">
                     本时间窗外或无日期
                   </span>
                 )}
@@ -128,26 +129,26 @@ export function CommandGantt({
       })}
 
       {tbd.length > 0 && (
-        <div className="border-t border-amber-500/20 bg-amber-500/[0.03] p-3">
-          <h3 className="mb-2 text-xs font-mono tracking-widest text-amber-200/80">
+        <div className="border-t border-amber-400/30 bg-amber-500/10 p-3">
+          <h3 className="mb-2 text-xs font-mono font-medium tracking-widest text-amber-200">
             待定 TBD
           </h3>
           <div className="flex flex-wrap gap-2">
             {tbd.map((p) => (
               <div
                 key={p.id}
-                className="flex items-center gap-2 rounded border border-amber-500/25 bg-amber-500/5 px-3 py-2"
+                className="flex items-center gap-2 rounded-md border border-amber-400/35 bg-amber-500/10 px-3 py-2"
               >
                 <Link
                   href={`/command/projects/${p.id}`}
-                  className="text-sm text-amber-100/90"
+                  className="text-sm font-medium text-amber-100"
                 >
                   {p.title}
                 </Link>
                 <form action={returnToReserve.bind(null, p.id)}>
                   <button
                     type="submit"
-                    className="text-[10px] text-slate-500 hover:text-amber-200/90"
+                    className="gant-text-muted text-[10px] hover:text-amber-200"
                   >
                     降回
                   </button>
@@ -159,9 +160,9 @@ export function CommandGantt({
       )}
 
       {onTimeline.length === 0 && tbd.length === 0 ? (
-        <p className="p-4 text-sm text-slate-500">暂无在轴项目。</p>
+        <p className="gant-text-muted p-4 text-sm">暂无在轴项目。</p>
       ) : null}
-      <p className="border-t border-cyan-500/10 p-2 text-[10px] text-slate-600">
+      <p className="gant-text-muted border-t border-[var(--gant-line-soft)] p-2 text-[10px]">
         窗: {windowStart.toLocaleDateString()} — {windowEnd.toLocaleDateString()}{" "}
         · {WEEKS} 周
       </p>

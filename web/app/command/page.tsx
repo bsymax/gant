@@ -33,25 +33,24 @@ export default async function CommandPage() {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
       <section>
-        <h2 className="mb-3 flex items-center gap-2 font-mono text-sm uppercase tracking-widest text-amber-200/80">
-          <span className="h-2 w-2 rounded-sm bg-amber-400/80" />
+        <h2 className="gant-section-amber mb-3 flex items-center gap-2 font-mono text-sm font-medium uppercase tracking-widest">
+          <span className="h-2 w-2 rounded-sm bg-amber-400" />
           储备与意向
         </h2>
-        <p className="mb-3 text-xs text-slate-500">
-          新建默认进池；未上时间轴、无日期承诺。可拖入时间轴与 PRD §3.1
-          一致（当前为表单项）。
+        <p className="gant-text-muted mb-3 text-xs">
+          新建默认进池；未上时间轴、无日期承诺。与 PRD §3.1 一致（当前为表单项）。
         </p>
         <div className="gant-panel mb-4 p-4">
           <form action={createProjectInReserve} className="flex flex-wrap gap-2">
             <input
               name="title"
               placeholder="新项目名称"
-              className="gant-input min-w-[200px] flex-1 rounded border border-cyan-500/20 bg-slate-950/80 px-3 py-2 text-sm"
+              className="gant-input min-w-[200px] flex-1 px-3 py-2.5 text-sm"
             />
             <input
               name="description"
               placeholder="说明（可空）"
-              className="gant-input min-w-[200px] flex-1 rounded border border-cyan-500/20 bg-slate-950/80 px-3 py-2 text-sm"
+              className="gant-input min-w-[200px] flex-1 px-3 py-2.5 text-sm"
             />
             <button
               type="submit"
@@ -70,21 +69,21 @@ export default async function CommandPage() {
               <div>
                 <Link
                   href={`/command/projects/${p.id}`}
-                  className="font-medium text-cyan-100/90 hover:underline"
+                  className="gant-link font-medium"
                 >
                   {p.title}
                 </Link>
                 {p.description ? (
-                  <p className="mt-1 line-clamp-2 text-xs text-slate-500">
+                  <p className="gant-text-muted mt-1 line-clamp-2 text-xs">
                     {p.description}
                   </p>
                 ) : null}
               </div>
               <form
                 action={deployFromReserve.bind(null, p.id)}
-                className="mt-3 space-y-2 border-t border-cyan-500/10 pt-3"
+                className="mt-3 space-y-2 border-t border-[var(--gant-line-soft)] pt-3"
               >
-                <div className="flex gap-2 text-xs text-slate-400">
+                <div className="gant-text-body flex gap-2 text-xs">
                   <label className="flex items-center gap-1">
                     <input
                       type="radio"
@@ -103,17 +102,17 @@ export default async function CommandPage() {
                   <input
                     type="date"
                     name="plannedStart"
-                    className="gant-input rounded border border-cyan-500/20 bg-slate-950/80 px-2 py-1 text-xs"
+                    className="gant-input px-2 py-1.5 text-xs"
                   />
                   <input
                     type="date"
                     name="plannedEnd"
-                    className="gant-input rounded border border-cyan-500/20 bg-slate-950/80 px-2 py-1 text-xs"
+                    className="gant-input px-2 py-1.5 text-xs"
                     title="结束可空"
                   />
                   <button
                     type="submit"
-                    className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-xs text-amber-100/90 hover:bg-amber-500/20"
+                    className="rounded-md border border-amber-400/45 bg-amber-500/15 px-2 py-1.5 text-xs font-medium text-amber-100 hover:bg-amber-500/25"
                   >
                     上战场
                   </button>
@@ -122,14 +121,14 @@ export default async function CommandPage() {
             </div>
           ))}
           {reserve.length === 0 ? (
-            <p className="text-sm text-slate-500">战情池空，请新建。</p>
+            <p className="gant-text-muted text-sm">战情池空，请新建。</p>
           ) : null}
         </div>
       </section>
 
       <section>
-        <h2 className="mb-3 flex items-center gap-2 font-mono text-sm uppercase tracking-widest text-cyan-200/80">
-          <span className="h-2 w-2 rounded-sm bg-cyan-400/80" />
+        <h2 className="gant-section-cyan mb-3 flex items-center gap-2 font-mono text-sm font-medium uppercase tracking-widest">
+          <span className="h-2 w-2 rounded-sm bg-sky-400" />
           时间轴与待定列
         </h2>
         <CommandGantt

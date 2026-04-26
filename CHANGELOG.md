@@ -1,5 +1,20 @@
 # 变更记录
 
+## [0.2.0] - 2026-04-26
+
+### 新增
+
+- **「极光指挥台 · Aurora v2」** 配色：整体调亮、提高正文与线框对比，保留科技/HUD/轻度游戏感；以 `web/app/globals.css` 的 `:root` 与 `.gant-*` 为唯一主入口。
+- 文档包：**系统功能与文件地图**、**界面与配色说明**、**初始化配置说明**、**配置表（Markdown 模板）**、**docs 索引**。
+- 支持 **`web/config/initial-data.json`**（不提交 Git）：按 JSON 配用户/项目/时间/事项后 `npm run db:seed` 导入；无此文件时仍用内置示范种子。示例见 `web/config/initial-data.example.json`。
+
+### 工程
+
+- 根目录 `.gitignore` 增加忽略 `web/config/initial-data.json`。
+- 应用 `web/package.json` 版本与本文对齐为 **0.2.0**。
+
+---
+
 ## [0.1.0] - 2026-04-26
 
 ### 新增
