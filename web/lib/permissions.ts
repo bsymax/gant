@@ -24,10 +24,11 @@ export async function canAccessProject(
 /** 可编辑项目元数据与成员 */
 export async function canManageProjectRoster(
   u: SessionUser,
-  projectId: string
+  _projectId: string
 ): Promise<boolean> {
+  void _projectId;
   if (u.role === UserRole.LEAD) return true;
-  return isProjectMember(u.id, projectId);
+  return false;
 }
 
 export async function canCreateTask(
@@ -38,17 +39,21 @@ export async function canCreateTask(
   return isProjectMember(u.id, projectId);
 }
 
-export async function canEditTask(
+/** 可编辑任务元数据（标题、描述、优先级、计划日期等）：组长、主将、副将 */
+export async function canEditTaskMeta(
   u: SessionUser,
   projectId: string,
   taskId: string
 ): Promise<boolean> {
   if (u.role === UserRole.LEAD) return true;
-  if (await isProjectMember(u.id, projectId)) {
-    return true;
-  }
-  const assign = await prisma.taskAssignee.findFirst({
+  const task = await prisma.task.findFirst({
+    where: { id: taskId, projectId },
+    select: { ownerUserId: true },
+  });
+  if (!task) return false;
+  if (task.ownerUserId === u.id) return true;
+  const support = await prisma.taskAssignee.findFirst({
     where: { taskId, userId: u.id },
   });
-  return !!assign;
+  return !!support;
 }

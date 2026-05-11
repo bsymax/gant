@@ -28,7 +28,10 @@ export async function getSession(): Promise<SessionUser | null> {
     const { payload } = await jwtVerify(token, getSecret());
     const sub = payload.sub as string | undefined;
     if (!sub) return null;
-    const u = await prisma.user.findUnique({ where: { id: sub } });
+    const u = await prisma.user.findUnique({
+      where: { id: sub },
+      select: { id: true, name: true, erp: true, role: true },
+    });
     if (!u) return null;
     return {
       id: u.id,

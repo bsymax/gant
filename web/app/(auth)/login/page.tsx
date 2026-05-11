@@ -1,48 +1,32 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { loginAction } from "@/app/actions/auth";
+import { LoginForms } from "@/components/LoginForms";
 
 export default async function LoginPage() {
   const s = await getSession();
   if (s) {
     redirect("/command");
   }
-  const users = await prisma.user.findMany({ orderBy: { erp: "asc" } });
+  const dev = process.env.AUTH_DEV === "1";
+  const users = dev
+    ? await prisma.user.findMany({
+        orderBy: { erp: "asc" },
+        select: { id: true, erp: true, name: true, role: true },
+      })
+    : [];
+
   return (
     <div className="gant-canvas flex min-h-full flex-1 items-center justify-center p-6">
       <div className="gant-panel w-full max-w-md p-6">
-        <h1 className="mb-1 font-mono text-lg font-semibold tracking-wider text-cyan-200">
+        <h1 className="mb-1 font-mono text-lg font-semibold tracking-wider text-slate-800">
           指挥台登录
         </h1>
         <p className="gant-text-body mb-6 text-sm">
-          开发期选身份进入（<code className="text-sky-400">AUTH_DEV=1</code>
-          ）。生产环境请接真实鉴权。
+          使用 ERP 与密码登录。
+          {dev ? " 下方提供开发期快捷选用户入口。" : ""}
         </p>
-        <form action={loginAction} className="space-y-4">
-          <label className="gant-text-body block text-sm">用户</label>
-          <select
-            name="userId"
-            required
-            className="gant-input w-full px-3 py-2.5"
-            defaultValue=""
-          >
-            <option value="" disabled>
-              选择用户…
-            </option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.name} {u.erp}（{u.role === "LEAD" ? "组长" : "成员"}）
-              </option>
-            ))}
-          </select>
-          <button
-            type="submit"
-            className="gant-btn w-full rounded px-4 py-2 font-mono text-sm uppercase tracking-widest"
-          >
-            进入
-          </button>
-        </form>
+        <LoginForms showDevPicker={dev} users={users} />
       </div>
     </div>
   );

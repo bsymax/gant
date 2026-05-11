@@ -3,37 +3,50 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// SQLite 无原生 enum，用 String + 应用层约束
+// 无原生 enum，用 String + 应用层约束（PostgreSQL 同理）
 model User {
   id        String   @id @default(cuid())
   erp       String   @unique
   name      String
   role      String // LEAD | MEMBER
+  /// bcrypt 哈希；空字符串表示尚未设置，禁止密码登录
+  passwordHash String @default("")
+  avatarUrl String   @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  projectMembers ProjectMember[]
-  taskAssignees  TaskAssignee[]
-  auditLogs      AuditLog[]
+  projectMembers           ProjectMember[]
+  taskAssignees            TaskAssignee[]
+  ownedTasks               Task[]                   @relation("TaskOwner")
+  auditLogs                AuditLog[]
+  weeklyOutcomesUpdated    TaskWeeklyOutcome[]      @relation("WeeklyOutcomeUpdatedBy")
+  weeklyAllocations        MemberWeeklyAllocation[] @relation("WeeklyAllocationUser")
+  weeklyAllocationsUpdated MemberWeeklyAllocation[] @relation("WeeklyAllocationUpdatedBy")
+  projectWeeklyTracksUpdated ProjectWeeklyTrack[]   @relation("ProjectWeeklyTrackUpdatedBy")
+  taskWeeklyTracksUpdated    TaskWeeklyTrack[]      @relation("TaskWeeklyTrackUpdatedBy")
 }
 
 model Project {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   title        String
-  description  String   @default("")
-  status       String   @default("ACTIVE") // DRAFT | ACTIVE | DONE | ARCHIVED
-  scheduleMode String   @default("IN_RESERVE") // IN_RESERVE | ON_TIMELINE | TBD_ON_TIMELINE
+  description  String    @default("")
+  /// PLANNING | IN_PROGRESS | NEED_ATTENTION | AT_RISK | CLOSED
+  status       String    @default("PLANNING")
+  scheduleMode String    @default("IN_RESERVE") // IN_RESERVE | ON_TIMELINE（未钉日期则 planned 为空，界面单列展示）
   plannedStart DateTime?
   plannedEnd   DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  sortOrder    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  members ProjectMember[]
-  tasks   Task[]
+  members           ProjectMember[]
+  tasks             Task[]
+  weeklyAllocations MemberWeeklyAllocation[]
+  weeklyTracks      ProjectWeeklyTrack[]
 }
 
 model ProjectMember {
@@ -48,18 +61,45 @@ model ProjectMember {
 }
 
 model Task {
-  id          String   @id @default(cuid())
-  projectId   String
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  title       String
-  description String   @default("")
-  status      String   @default("TODO") // TODO | IN_PROGRESS | DONE | CANCELLED
-  plannedStart DateTime?
-  plannedEnd  DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-  assignees TaskAssignee[]
+  /// 子任务时指向父任务；仅支持一层子任务
+  parentTaskId String?
+  parentTask   Task?   @relation("Subtasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
+  subtasks     Task[]  @relation("Subtasks")
+
+  title       String
+  description String  @default("")
+  /// PENDING_START | IN_PROGRESS | BLOCKED | PENDING_ACCEPTANCE | COMPLETED | CANCELLED
+  status      String  @default("PENDING_START")
+  /// P0 | P1 | P2
+  priority    String?
+  /// 0-100
+  progress    Int     @default(0)
+
+  dependencyParty   String?
+  metric            String?
+  /// status=CANCELLED 时说明
+  cancelReason      String?
+  plannedStart      DateTime?
+  plannedAcceptance DateTime?
+  plannedEnd        DateTime?
+  sortOrder         Int     @default(0)
+  /// 主 R（必有一人）
+  ownerUserId       String
+  owner             User      @relation("TaskOwner", fields: [ownerUserId], references: [id], onDelete: Restrict)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  /// 仅「支持」角色，非必；主 R 在 ownerUserId
+  assignees         TaskAssignee[]
+  weeklyOutcomes    TaskWeeklyOutcome[]
+  weeklyAllocations MemberWeeklyAllocation[]
+  weeklyTracks      TaskWeeklyTrack[]
+
+  @@index([projectId, parentTaskId])
 }
 
 model TaskAssignee {
@@ -82,4 +122,89 @@ model AuditLog {
   user       User     @relation(fields: [userId], references: [id])
   diffJson   String
   createdAt  DateTime @default(now())
+}
+
+model TaskWeeklyOutcome {
+  id              String   @id @default(cuid())
+  taskId          String
+  weekStart       DateTime
+  /// HIT | PARTIAL | MISS
+  outcomeStatus   String
+  plannedProgress Int?
+  actualProgress  Int?
+  note            String   @default("")
+  updatedByUserId String
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  task      Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  updatedBy User @relation("WeeklyOutcomeUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: Restrict)
+
+  @@unique([taskId, weekStart])
+  @@index([weekStart])
+}
+
+model MemberWeeklyAllocation {
+  id              String   @id @default(cuid())
+  weekStart       DateTime
+  userId          String
+  projectId       String
+  taskId          String?
+  /// 0-100，可超配，项目/任务层累加
+  allocationPct   Int
+  note            String   @default("")
+  updatedByUserId String
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  user      User    @relation("WeeklyAllocationUser", fields: [userId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task      Task?   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  updatedBy User    @relation("WeeklyAllocationUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: Restrict)
+
+  @@unique([weekStart, userId, projectId, taskId])
+  @@index([weekStart, userId])
+  @@index([projectId, weekStart])
+}
+
+model ProjectWeeklyTrack {
+  id              String   @id @default(cuid())
+  projectId       String
+  weekStart       DateTime
+  /// PLANNING | IN_PROGRESS | NEED_ATTENTION | AT_RISK | CLOSED
+  plannedStatus   String
+  /// PLANNING | IN_PROGRESS | NEED_ATTENTION | AT_RISK | CLOSED
+  actualStatus    String
+  note            String   @default("")
+  updatedByUserId String
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  updatedBy User    @relation("ProjectWeeklyTrackUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: Restrict)
+
+  @@unique([projectId, weekStart])
+  @@index([weekStart])
+  @@index([projectId, weekStart])
+}
+
+model TaskWeeklyTrack {
+  id              String   @id @default(cuid())
+  taskId          String
+  weekStart       DateTime
+  /// PENDING_START | IN_PROGRESS | BLOCKED | PENDING_ACCEPTANCE | COMPLETED | CANCELLED
+  plannedStatus   String
+  /// PENDING_START | IN_PROGRESS | BLOCKED | PENDING_ACCEPTANCE | COMPLETED | CANCELLED
+  actualStatus    String
+  note            String   @default("")
+  updatedByUserId String
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  task      Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  updatedBy User @relation("TaskWeeklyTrackUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: Restrict)
+
+  @@unique([taskId, weekStart])
+  @@index([weekStart])
+  @@index([taskId, weekStart])
 }
