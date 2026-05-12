@@ -60,7 +60,7 @@ export async function deployFromReserve(
     const next = await prisma.project.update({
       where: { id: projectId },
       data: {
-        scheduleMode: ScheduleMode.TBD_ON_TIMELINE,
+        scheduleMode: ScheduleMode.ON_TIMELINE,
         plannedStart: null,
         plannedEnd: null,
       },
