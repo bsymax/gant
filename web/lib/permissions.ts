@@ -57,3 +57,6 @@ export async function canEditTaskMeta(
   });
   return !!support;
 }
+
+/** 与 `canEditTaskMeta` 同义；保留别名供旧版 `actions` import，避免云上构建报错。 */
+export const canEditTask = canEditTaskMeta;
