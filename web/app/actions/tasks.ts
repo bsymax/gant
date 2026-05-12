@@ -22,10 +22,12 @@ export async function createTask(projectId: string, formData: FormData) {
   const title = String(formData.get("title") || "").trim();
   if (!title) throw new Error("事项标题必填");
   const t = await prisma.task.create({
-    data: { projectId, title, status: TaskStatus.TODO },
-  });
-  await prisma.taskAssignee.create({
-    data: { taskId: t.id, userId: u.id },
+    data: {
+      projectId,
+      title,
+      status: TaskStatus.PENDING_START,
+      ownerUserId: u.id,
+    },
   });
   await logAudit({
     entityType: AuditEntity.TASK,
